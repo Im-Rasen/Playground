@@ -473,7 +473,7 @@ int main()
     unsigned texwidth, texheight;
 
     //Декодирование
-    unsigned error = lodepng::decode(image, texwidth, texheight, "/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/stone.png");
+    unsigned error = lodepng::decode(image, texwidth, texheight, "/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/container2.png");
 
     //Ошибки
     if(error) std::cout << "DECODER::ERROR " << error << ": " << lodepng_error_text(error) << std::endl;
@@ -516,7 +516,7 @@ int main()
     
     //Загрузка lodepng
     //Декодирование
-    error = lodepng::decode(image, texwidth, texheight, "/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/grass.png");
+    error = lodepng::decode(image, texwidth, texheight, "/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/wood.png");
 
     //Ошибки
     if(error) std::cout << "DECODER::ERROR " << error << ": " << lodepng_error_text(error) << std::endl;
@@ -558,7 +558,7 @@ int main()
     
     //Загрузка lodepng
     //Декодирование
-    error = lodepng::decode(image, texwidth, texheight, "/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/bulb.png");
+    error = lodepng::decode(image, texwidth, texheight, "/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/window.png");
 
     //Ошибки
     if(error) std::cout << "DECODER::ERROR " << error << ": " << lodepng_error_text(error) << std::endl;
@@ -781,6 +781,7 @@ int main()
         
         //Объекты
         glBindVertexArray(objectVAO);
+        //Зеркальный куб
         //Текстура
         //glBindTexture(GL_TEXTURE_2D, texture1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
@@ -865,8 +866,8 @@ int main()
         //Текстура
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texObject);
-        //glActiveTexture(GL_TEXTURE1);
-        //glBindTexture(GL_TEXTURE_2D, texObjectSpecular);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texObjectSpecular);
         for(GLuint i = 0; i < 10; i++)
         {
             glm::mat4 model(1.0f);
