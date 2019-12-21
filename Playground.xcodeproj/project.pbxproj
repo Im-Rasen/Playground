@@ -20,11 +20,14 @@
 		755B30D9239D5F7A001883CA /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 755B30D7239D5F7A001883CA /* OpenGL.framework */; };
 		755B30DB239D5FC0001883CA /* libGLEW.2.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 755B30DA239D5FC0001883CA /* libGLEW.2.1.0.dylib */; };
 		755B30DD239D5FD0001883CA /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 755B30DC239D5FD0001883CA /* libglfw.3.3.dylib */; };
+		756BF8BA23AE71BD00F7AD86 /* shadow_shader.vs in Sources */ = {isa = PBXBuildFile; fileRef = 756BF8B923AE71BD00F7AD86 /* shadow_shader.vs */; };
 		7593109D239D624B00EA6534 /* lodepng.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7593109B239D624B00EA6534 /* lodepng.cpp */; };
 		759310AD239D7C6A00EA6534 /* simple_shader.frag in Sources */ = {isa = PBXBuildFile; fileRef = 759310AC239D7C6A00EA6534 /* simple_shader.frag */; };
 		759310AF239D7C8600EA6534 /* simple_shader.vs in Sources */ = {isa = PBXBuildFile; fileRef = 759310AE239D7C8600EA6534 /* simple_shader.vs */; };
 		759310B1239D850900EA6534 /* lamp_shader.frag in Sources */ = {isa = PBXBuildFile; fileRef = 759310B0239D850900EA6534 /* lamp_shader.frag */; };
 		759310B3239D851D00EA6534 /* lamp_shader.vs in Sources */ = {isa = PBXBuildFile; fileRef = 759310B2239D851D00EA6534 /* lamp_shader.vs */; };
+		75B11B4A23AE753300A04960 /* shadow_shader.frag in Sources */ = {isa = PBXBuildFile; fileRef = 75B11B4923AE753300A04960 /* shadow_shader.frag */; };
+		75B11B4D23AE8CDA00A04960 /* debug_quad_depth.vs in Sources */ = {isa = PBXBuildFile; fileRef = 75B11B4B23AE8CDA00A04960 /* debug_quad_depth.vs */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -54,6 +57,7 @@
 		755B30D7239D5F7A001883CA /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		755B30DA239D5FC0001883CA /* libGLEW.2.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.2.1.0.dylib; path = ../../../../../../usr/local/Cellar/glew/2.1.0/lib/libGLEW.2.1.0.dylib; sourceTree = "<group>"; };
 		755B30DC239D5FD0001883CA /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../../../usr/local/Cellar/glfw/3.3/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
+		756BF8B923AE71BD00F7AD86 /* shadow_shader.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shadow_shader.vs; sourceTree = "<group>"; };
 		7593109B239D624B00EA6534 /* lodepng.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lodepng.cpp; sourceTree = "<group>"; };
 		7593109C239D624B00EA6534 /* lodepng.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lodepng.h; sourceTree = "<group>"; };
 		759310AB239D644300EA6534 /* shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shader.h; sourceTree = "<group>"; };
@@ -61,6 +65,9 @@
 		759310AE239D7C8600EA6534 /* simple_shader.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = simple_shader.vs; sourceTree = "<group>"; };
 		759310B0239D850900EA6534 /* lamp_shader.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = lamp_shader.frag; sourceTree = "<group>"; };
 		759310B2239D851D00EA6534 /* lamp_shader.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = lamp_shader.vs; sourceTree = "<group>"; };
+		75B11B4923AE753300A04960 /* shadow_shader.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shadow_shader.frag; sourceTree = "<group>"; };
+		75B11B4B23AE8CDA00A04960 /* debug_quad_depth.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = debug_quad_depth.vs; sourceTree = "<group>"; };
+		75B11B4C23AE8CDA00A04960 /* debug_quad_depth.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = debug_quad_depth.frag; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +120,10 @@
 				759310AE239D7C8600EA6534 /* simple_shader.vs */,
 				7593109B239D624B00EA6534 /* lodepng.cpp */,
 				7593109C239D624B00EA6534 /* lodepng.h */,
+				756BF8B923AE71BD00F7AD86 /* shadow_shader.vs */,
+				75B11B4923AE753300A04960 /* shadow_shader.frag */,
+				75B11B4B23AE8CDA00A04960 /* debug_quad_depth.vs */,
+				75B11B4C23AE8CDA00A04960 /* debug_quad_depth.frag */,
 				759310AB239D644300EA6534 /* shader.h */,
 			);
 			path = Playground;
@@ -189,6 +200,7 @@
 				755B30D2239D5E2F001883CA /* screen_shader.frag in Sources */,
 				755B30CE239D5D72001883CA /* sky_shader.frag in Sources */,
 				755B30D4239D5E42001883CA /* screen_shader.vs in Sources */,
+				756BF8BA23AE71BD00F7AD86 /* shadow_shader.vs in Sources */,
 				759310B1239D850900EA6534 /* lamp_shader.frag in Sources */,
 				759310B3239D851D00EA6534 /* lamp_shader.vs in Sources */,
 				75483282239026C400115776 /* main.cpp in Sources */,
@@ -199,6 +211,8 @@
 				759310AD239D7C6A00EA6534 /* simple_shader.frag in Sources */,
 				755B30CA239D5D4B001883CA /* mirror_shader.frag in Sources */,
 				759310AF239D7C8600EA6534 /* simple_shader.vs in Sources */,
+				75B11B4A23AE753300A04960 /* shadow_shader.frag in Sources */,
+				75B11B4D23AE8CDA00A04960 /* debug_quad_depth.vs in Sources */,
 				755B30CC239D5D5F001883CA /* mirror_shader.vs in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

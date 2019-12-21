@@ -31,6 +31,7 @@ glm::vec3 cameraUp        = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 cameraTarget    = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 cameraDirection = glm::normalize(cameraPosition - cameraTarget);
 glm::vec3 cameraFront     = -cameraDirection;
+glm::vec3 up              = glm::vec3(0.0f, 1.0f, 0.0f);
 //Углы
 GLfloat yaw   = -90.0f;
 GLfloat pitch = 0.0f;
@@ -52,6 +53,7 @@ glm::vec3 dirSpecular   = glm::vec3(0.4f);
 glm::vec3 projAmbient   = glm::vec3(0.05f);
 glm::vec3 projDiffuse   = glm::vec3(projDiffuseRate);
 glm::vec3 projSpecular  = glm::vec3(0.7f);
+glm::vec3 dirPosition   = glm::vec3(7.0f, -7.0f, 7.0f);
 
 bool flashlight = true;
 bool sun = true;
@@ -134,6 +136,8 @@ int main()
     Shader mirrorShader("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/mirror_shader.vs", "/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/mirror_shader.frag");
     Shader shader("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/simple_shader.vs","/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/simple_shader.frag");
     Shader lampShader("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/lamp_shader.vs","/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/lamp_shader.frag");
+    Shader shadowShader("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/shadow_shader.vs","/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/shadow_shader.frag");
+    Shader debugDepthQuad("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/debug_quad_depth.vs", "/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/debug_quad_depth.frag");
     
     //Куб
     float vertices[] = {
@@ -379,7 +383,6 @@ int main()
     //Квад
     GLuint quadVAO;
     glGenVertexArrays(1, &quadVAO);
-    
     GLuint quadVBO;
     glGenBuffers(1, &quadVBO);
     glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
@@ -391,6 +394,22 @@ int main()
     glEnableVertexAttribArray(0);
     // Атрибут с текстурой
     glVertexAttribPointer(1, 2, GL_FLOAT,GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
+    
+    
+    //Квад Тени
+    GLuint shadowQuadVAO;
+    glGenVertexArrays(1, &shadowQuadVAO);
+    GLuint shadowQuadVBO;
+    glGenBuffers(1, &shadowQuadVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, shadowQuadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+    glBindVertexArray(shadowQuadVAO);
+    // Атрибут с координатами
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+    glEnableVertexAttribArray(0);
+    // Атрибут с текстурой
+    glVertexAttribPointer(1, 2, GL_FLOAT,GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
     
     glBindVertexArray(0);
@@ -417,7 +436,6 @@ int main()
     unsigned int fbo;
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    
     //Текстура для кадрового буфера
     unsigned int texColorBuffer;
     glGenTextures(1, &texColorBuffer);
@@ -426,6 +444,33 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    
+    
+    
+    //Кадровый буфер (текстурный, для карты теней)
+    unsigned int depthMapFBO;
+    glGenFramebuffers(1, &depthMapFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    //Текстура для кадрового буфера
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    unsigned int depthMap;
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    //не интереует rgba -> depth_component
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+                 SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    //Присоединяем текстуру глубины к framebuf как буфер глубины
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    
+    
     
     //Прикрепление текстуры
     //Чтение/запись,тип подключения(цвет/глубина/трафарет),тип текстур,текстура,МИП-уровень для вывода
@@ -516,7 +561,7 @@ int main()
     
     //Загрузка lodepng
     //Декодирование
-    error = lodepng::decode(image, texwidth, texheight, "/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/wood.png");
+    error = lodepng::decode(image, texwidth, texheight, "/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/metal.png");
 
     //Ошибки
     if(error) std::cout << "DECODER::ERROR " << error << ": " << lodepng_error_text(error) << std::endl;
@@ -591,8 +636,8 @@ int main()
     glBindTexture(GL_TEXTURE_2D, texObjectSpecular);
     
     //Параметры семплинга
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
        
     //Параметры МипМапов
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//GL_LINEAR_MIPMAP_LINEAR / GL_LINEAR / GL_NEAREST
@@ -684,6 +729,9 @@ int main()
     
     //---Texture::END---
     
+    //debug shader
+    debugDepthQuad.Use();
+    debugDepthQuad.setInt("depthMap", 0);
     
     //Игровой цикл
     while(!glfwWindowShouldClose(window))
@@ -704,9 +752,81 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         
+        //render
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // буфер трафарета не используется
         
+        //SHADOW MAP
+        // 1. сначала рисуем карту глубины
+        //lightProjection - dirShadowProjection
+        //lightView = dirShadowView
+        //lightSpaceMatrix - dirShadowMatrix
+        //Пространство
+        float near_plane = 1.0f, far_plane = 7.5f;
+        glm::mat4 dirShadowProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        glm::mat4 dirShadowView =   glm::lookAt(dirPosition, //Camera(light)Position
+                                                glm::vec3(0.0f), //Camera(light)Direction
+                                                up);//Camera(light)Up
+        glm::mat4 dirShadowMatrix = dirShadowProjection * dirShadowView;
+        //Шейдер
+        shadowShader.Use();
+        shadowShader.setMat4("dirShadowMatrix", dirShadowMatrix);
+        //Рендер
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        //РЕНДЕР
+        glBindVertexArray(objectVAO);
+            /*
+            //Зеркальный куб 1
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+            shadowShader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            //Зеркальный Куб2
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+            shadowShader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            */
+            //Кубики
+            for(GLuint i = 0; i < 10; i++)
+            {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, cubePositions[i]);
+                GLfloat angle = (GLfloat)glfwGetTime() * glm::radians(15.0f + i*10.0f);
+                model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
+                shadowShader.setMat4("model", model);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+        
+        glBindVertexArray(floorVAO);
+            shadowShader.setMat4("model", glm::mat4(1.0f));
+            glDrawArrays(GL_TRIANGLES, 0, 12);
+        
+        glBindVertexArray(0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+             
+        
+        // reset viewport
+        glViewport(0, 0, screenWidth, screenHeight);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // render Depth map to quad for visual debugging
+        // ---------------------------------------------
+        debugDepthQuad.Use();
+        debugDepthQuad.setFloat("near_plane", near_plane);
+        debugDepthQuad.setFloat("far_plane", far_plane);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glBindVertexArray(shadowQuadVAO);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindVertexArray(0);
+        
+        
+        /*
         // Первый проход
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        glViewport(0, 0, screenWidth, screenHeight); //Нужно при карте теней
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // буфер трафарета не используется
         glEnable(GL_DEPTH_TEST);
@@ -720,7 +840,6 @@ int main()
         //Камера (Грама-Шмидта)
         GLfloat radius = 2.0f;
         glm::vec3 cameraDirection = glm::normalize(cameraPosition - cameraTarget); // Камера -> Z+
-        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
         glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection)); // Камера -> X+
         cameraUp = glm::cross(cameraDirection, cameraRight); // Камера -> Y+
         //Позиция камеры, Цель камеры, Орт вверх
@@ -786,7 +905,7 @@ int main()
         //glBindTexture(GL_TEXTURE_2D, texture1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
         //Куб 1
-        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
         mirrorShader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -799,6 +918,8 @@ int main()
         //Пол
         ourShader.Use();
         
+        //Тени
+        ourShader.setInt("shadowMap", 2);
         //Материал
         ourShader.setInt("material.ambient", 0);
         ourShader.setInt("material.diffuse", 0);
@@ -806,7 +927,7 @@ int main()
         ourShader.setFloat("material.shininess", 32.0f);
         
         //Направленный свет
-        ourShader.setVec3("dirLight.direction", 0.2f, -1.0f, 0.3f);
+        ourShader.setVec3("dirLight.direction", dirPosition);
         ourShader.setVec3("dirLight.ambient", dirAmbient);
         ourShader.setVec3("dirLight.diffuse", dirDiffuse);
         ourShader.setVec3("dirLight.specular", dirSpecular);
@@ -868,6 +989,8 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texObject);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texObjectSpecular);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
         for(GLuint i = 0; i < 10; i++)
         {
             glm::mat4 model(1.0f);
@@ -883,8 +1006,11 @@ int main()
         //Текстура
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texFloor);
-        //glActiveTexture(GL_TEXTURE1);
+        glActiveTexture(GL_TEXTURE1);
         //glBindTexture(GL_TEXTURE_2D, texFloorSpecular);
+        glBindTexture(GL_TEXTURE_2D, texFloor);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
         //Пол 1
         ourShader.setMat4("model", glm::mat4(1.0f));
         ourShader.setFloat("shiftX", 0.0f);
@@ -935,6 +1061,8 @@ int main()
         glBindVertexArray(quadVAO);
         glBindTexture(GL_TEXTURE_2D, texColorBuffer);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+        
+         */
         
         //Смена буферов
         glfwSwapBuffers(window);

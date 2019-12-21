@@ -6,6 +6,9 @@ out vec4 color;
 in vec2 TexCoord;
 in vec3 Normal;
 in vec3 worldPosition; // Позиция текущего фрагмента
+in vec4 dirShadowPosition; // Позиция текущего фрагмента в координатах источника света
+
+uniform sampler2D shadowMap;
 
 struct Material {
     sampler2D ambient;
@@ -61,9 +64,10 @@ uniform ProjectLight projLight;
 uniform vec3 viewPosition;
 
 
-vec3 CalcDirLight(DirectLight dirLight, vec3 norm, vec3 viewDirection);
+vec3 CalcDirLight(DirectLight dirLight, vec3 norm, vec3 viewDirection, float shadow);
 vec3 CalcPointLight(Light light, vec3 norm, vec3 worldPosition, vec3 viewDirection);
 vec3 CalcProjLight(ProjectLight projLight, vec3 norm, vec3 worldPosition, vec3 viewDirection);
+float ShadowCalculation(vec4 dirShadowPosition);
 
 void main()
 {
@@ -76,13 +80,13 @@ void main()
     
             //vec3 lightDir   = normalize(lightPos - FragPos);
             //vec3 halfwayDir = normalize(lightDir + viewDir);
-    
+    float shadow = ShadowCalculation(dirShadowPosition);
     
     vec3 norm = normalize(Normal);
     vec3 viewDirection = normalize(viewPosition - worldPosition);
     
     vec3 trueColor = vec3(0.0);
-    trueColor += CalcDirLight(dirLight, norm, viewDirection);
+    trueColor += CalcDirLight(dirLight, norm, viewDirection, shadow);
     for (int i = 0; i < NR_POINT_LIGHTS; i++)
         trueColor += CalcPointLight(light[i], norm, worldPosition, viewDirection);
     trueColor += CalcProjLight(projLight, norm, worldPosition, viewDirection);
@@ -92,7 +96,7 @@ void main()
     color = theColor;
 }
 
-vec3 CalcDirLight(DirectLight dirLight, vec3 norm, vec3 viewDirection)
+vec3 CalcDirLight(DirectLight dirLight, vec3 norm, vec3 viewDirection, float shadow)
 {
     //Направленный свет
     //Ambient
@@ -107,7 +111,7 @@ vec3 CalcDirLight(DirectLight dirLight, vec3 norm, vec3 viewDirection)
     //float dirSpec = pow(max(dot(viewDirection, dirReflectDirection), 0.0), material.shininess);
     float dirSpec = pow(max(dot(norm, halfwayDirection), 0.0), material.shininess/2.0f);
     vec3 dirSpecular = dirLight.specular * dirSpec * vec3(texture(material.specular, TexCoord));
-    return (dirAmbient + dirDiffuse + dirSpecular);
+    return (dirAmbient + (1.0 - shadow) * dirDiffuse + (1.0 - shadow) * dirSpecular);
 }
 
 
@@ -175,4 +179,14 @@ vec3 CalcProjLight(ProjectLight projLight, vec3 norm, vec3 worldPosition, vec3 v
     projSpecular *= projIntensity;
     
     return (projAmbient + projDiffuse + projSpecular);
+}
+
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+    vec3 projCoords = dirShadowPosition.xyz / dirShadowPosition.w;
+    projCoords = projCoords * 0.5 + 0.5; //Координаты текстуры [0,1] <- координаты фрагментов [-1,1]
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    float currentDepth = projCoords.z;
+    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+    return shadow;
 }
