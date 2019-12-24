@@ -3,7 +3,7 @@
 #define GLEW_STATIC
 #define cimg_use_jpeg
 #define NR_POINT_LIGHTS 4
-#define N_OBJECTS 4
+#define N_OBJECTS 2
 
 #include <iostream>
 #include <math.h>
@@ -46,8 +46,8 @@ float projDiffuseRate = 1.0f;
 float dirDiffuseRate = 0.3f;
 float scaleRate = 0.0f;
 glm::vec3 pointAmbient  = glm::vec3(0.05f);
-glm::vec3 pointDiffuse  = glm::vec3(0.5f);
-glm::vec3 pointSpecular = glm::vec3(0.6f);
+glm::vec3 pointDiffuse  = glm::vec3(0.6f);
+glm::vec3 pointSpecular = glm::vec3(0.7f);
 glm::vec3 dirAmbient    = glm::vec3(0.05f);
 glm::vec3 dirDiffuse    = glm::vec3(dirDiffuseRate);
 glm::vec3 dirSpecular   = glm::vec3(0.4f);
@@ -61,6 +61,7 @@ bool flashlight = true;
 bool sun = true;
 bool lamps = true;
 bool enchantment = false;
+bool shield = false;
 int post = 0;
 
 //Реализация нажатий
@@ -226,6 +227,7 @@ int main()
          4.0f, -2.001f, -4.0f,    2.0f, 2.0f,     0.0f, -1.0f, 0.0f
     };
     
+    //Щиты
     float opacityVertices[] = {
        //Позиции             //Текстурные  //Нормали
        0.0f,  0.5f,  0.0f,   0.0f, 1.0f,   0.0f, 0.0f, 1.0f,
@@ -295,10 +297,10 @@ int main()
     
     //Сдвиги кубиков N_OBJECTS
     glm::vec3 cubePositions[] = {
-      glm::vec3( 0.0f,  5.0f,  0.0f),
+      //glm::vec3( 0.0f,  5.0f,  0.0f),
       glm::vec3( 2.0f,  3.0f, -2.7f),
       glm::vec3(-1.5f, -2.8f, -2.5f),
-      glm::vec3(-3.8f, -2.0f,  1.5f),
+      //glm::vec3(-3.0f, -2.0f,  1.5f),
       //glm::vec3( 2.4f, -1.5f, -3.5f),
       //glm::vec3(-1.7f,  3.0f, -7.5f),
       //glm::vec3( 1.3f, -2.0f, -2.5f),
@@ -308,7 +310,7 @@ int main()
     };
     
     glm::vec3 pointLightPositions[] = {
-        glm::vec3(-0.7f,   0.8f,   2.0f),
+        glm::vec3(-0.7f,   1.2f,   2.0f),
         glm::vec3( 1.0f,  -2.7f,   1.0f),
         glm::vec3( 0.0f,  -5.0f,   0.0f),
         glm::vec3(-0.4f,   3.6f,  -3.0f)
@@ -406,7 +408,6 @@ int main()
     //Создаем Vertex Array Object
     GLuint objectVAO;
     glGenVertexArrays(1, &objectVAO);
-    
     //Создаем Vertex Buffer Objects
     GLuint objectVBO;
     glGenBuffers(1, &objectVBO);
@@ -414,12 +415,9 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, objectVBO);
     //Копируем вершинные данные в буфер + GL_STATIC_DRAW/GL_DYNAMIC_DRAW/GL_STREAM_DRAW
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    
     //Привязка VAO
     glBindVertexArray(objectVAO);
-    
     //Устанавливаем указатели на вершинные атрибуты //location = 0, vec3,,normalize,step_between_data_packs,смещение_начала_данных
-
     // Атрибут с координатами
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
@@ -433,7 +431,6 @@ int main()
     //Пол
     GLuint floorVAO;
     glGenVertexArrays(1, &floorVAO);
-    
     GLuint floorVBO;
     glGenBuffers(1, &floorVBO);
     glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
@@ -453,7 +450,6 @@ int main()
     //Герб
     GLuint coatVAO;
     glGenVertexArrays(1, &coatVAO);
-    
     GLuint coatVBO;
     glGenBuffers(1, &coatVBO);
     glBindBuffer(GL_ARRAY_BUFFER, coatVBO);
@@ -470,10 +466,9 @@ int main()
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
     glEnableVertexAttribArray(2);
     
-    //Полупрозрачные
+    //Полупрозрачные (щиты)
     GLuint opacityVAO;
     glGenVertexArrays(1, &opacityVAO);
-    
     GLuint opacityVBO;
     glGenBuffers(1, &opacityVBO);
     glBindBuffer(GL_ARRAY_BUFFER, opacityVBO);
@@ -503,7 +498,6 @@ int main()
     //Квад
     GLuint quadVAO;
     glGenVertexArrays(1, &quadVAO);
-    
     GLuint quadVBO;
     glGenBuffers(1, &quadVBO);
     glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
@@ -516,7 +510,6 @@ int main()
     // Атрибут с текстурой
     glVertexAttribPointer(1, 2, GL_FLOAT,GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
-    
     glBindVertexArray(0);
     
     // Квад нормал маппинг
@@ -548,7 +541,6 @@ int main()
     //Скайбокс
     GLuint skyVAO;
     glGenVertexArrays(1, &skyVAO);
-    
     GLuint skyVBO;
     glGenBuffers(1, &skyVBO);
     glBindBuffer(GL_ARRAY_BUFFER, skyVBO);
@@ -558,7 +550,6 @@ int main()
     // Атрибут с координатами
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
-    
     glBindVertexArray(0);
     
     
@@ -580,6 +571,7 @@ int main()
     //GL_DEPTH_ATTACHMENT -> format и internalformat объекта текстуры должны принять значение GL_DEPTH_COMPONENT
     //GL_STENCIL_ATTACHMENT -> параметры формата текстуры – GL_STENCIL_INDEX
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
+    
     
     //Рендербуфер для глубины и трафарета)
     unsigned int rbo;
@@ -735,7 +727,7 @@ int main()
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
         //Куб 1
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-1.0f, -3.5f, 2.2f));
+        model = glm::translate(model, glm::vec3(-1.0f, -3.49f, 2.2f));
         mirrorShader.setMat4("model", model);
         mirrorShader.setFloat("shiftX", 0.0f);
         mirrorShader.setFloat("shiftY", 0.0f);
@@ -744,7 +736,7 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, 36);
         //Куб2
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(2.0f, -3.5f, 2.5f));
+        model = glm::translate(model, glm::vec3(2.0f, -3.49f, 2.5f));
         mirrorShader.setMat4("model", model);
         mirrorShader.setFloat("shiftX", 0.0f);
         mirrorShader.setFloat("shiftZ", 0.0f);
@@ -759,14 +751,20 @@ int main()
         glBindVertexArray(lampVAO);
         for (int i = 0; i < NR_POINT_LIGHTS; i++)
         {
-           float k = ((sin(3 * glfwGetTime() + i * 3.0) / 2) + 0.5);
-           lampColor[i] = k * glm::vec3(0.82f, 0.26f, 0.0f) + (1 - k) * glm::vec3(1.0f, 0.84f, 0.2f);
-           lampShader.setVec3("lampColor", lampColor[i]);
-           model = glm::mat4(1.0f);
-           model = glm::translate(model, pointLightPositions[i]);
-           model = glm::scale(model, glm::vec3(0.1f));
-           lampShader.setMat4("model", model);
-           glDrawArrays(GL_TRIANGLES, 0, 36);
+            float k = ((sin(3 * glfwGetTime() + i * 3.0) / 2) + 0.5);
+            //lampColor[i] = k * glm::vec3(0.82f, 0.26f, 0.0f) + (1 - k) * glm::vec3(1.0f, 0.84f, 0.2f);
+            lampColor[i] = k * glm::vec3(1.0f, 0.0f, 0.0f) + (1 - k) * glm::vec3(0.8f, 0.6f, 0.5f);
+            lampShader.setVec3("lampColor", lampColor[i]);
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, pointLightPositions[i]);
+            model = glm::scale(model, glm::vec3(0.1f));
+            lampShader.setMat4("model", model);
+            k = sin(glfwGetTime());
+            float shift = (-3.0f * k + (1 - k) * 3.0f);
+            lampShader.setFloat("shiftX", shift);
+            lampShader.setFloat("shiftY", shift);
+            lampShader.setFloat("shiftZ", shift);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         glBindVertexArray(0);
         
@@ -923,34 +921,37 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 12);
         glBindVertexArray(0);
         
-        //Травка
-        shader.Use();
-        shader.setMat4("view", view);
-        shader.setMat4("projection", projection);
-        glBindVertexArray(opacityVAO);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texWindow);
-        //glActiveTexture(GL_TEXTURE1);
-        //glBindTexture(GL_TEXTURE_2D, texWindow);
-        for(std::map<GLfloat,GLfloat>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it) //vec3 вместо float
+        //Щиты
+        if (shield)
         {
-            model = glm::mat4(1.0f);
-            //model = glm::translate(model, it->second);
-            //model = glm::translate(model, glm::vec3(0.0f));
-            angle = (GLfloat)glfwGetTime() * 10.0f * it->second;//glm::radians(10.0f);
-            model = glm::rotate(model, glm::radians((angle + 90.0f)), up);
-            angle *= 0.01745;
-            shader.setMat4("model", model);
-            float shiftX = cameraPosition[0] + it->second * (cos(angle));
-            float shiftY = cameraPosition[1];
-            float shiftZ = cameraPosition[2] - it->second * (sin(angle));
-            shader.setFloat("shiftX", shiftX);
-            shader.setFloat("shiftY", shiftY);
-            shader.setFloat("shiftZ", shiftZ);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
+            shader.Use();
+            shader.setMat4("view", view);
+            shader.setMat4("projection", projection);
+            glBindVertexArray(opacityVAO);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, texWindow);
+            //glActiveTexture(GL_TEXTURE1);
+            //glBindTexture(GL_TEXTURE_2D, texWindow);
+            for(std::map<GLfloat,GLfloat>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it) //vec3 вместо float
+            {
+                model = glm::mat4(1.0f);
+                //model = glm::translate(model, it->second);
+                //model = glm::translate(model, glm::vec3(0.0f));
+                angle = (GLfloat)glfwGetTime() * 7.0f * it->second;//glm::radians(10.0f);
+                model = glm::rotate(model, glm::radians((angle + 90.0f)), up);
+                angle *= 0.01745;
+                shader.setMat4("model", model);
+                float shiftX = cameraPosition[0] + it->second * (cos(angle));
+                float shiftY = cameraPosition[1];
+                float shiftZ = cameraPosition[2] - it->second * (sin(angle));
+                shader.setFloat("shiftX", shiftX);
+                shader.setFloat("shiftY", shiftY);
+                shader.setFloat("shiftZ", shiftZ);
+                glDrawArrays(GL_TRIANGLES, 0, 6);
+            }
+            glBindVertexArray(0);
         }
-        
-        glBindVertexArray(0);
         
         // второй проход
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // возвращаем буфер кадра по умолчанию
@@ -1078,6 +1079,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         enchantment = true;
         post = (post + 1) % 4;
+    }
+    
+    if(key == GLFW_KEY_Q && action == GLFW_PRESS)
+    {
+        shield = not shield;
     }
 }
 
