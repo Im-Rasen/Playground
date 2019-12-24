@@ -44,6 +44,7 @@ GLfloat fov = 45.0f;
 //glm::vec3 lightPosition(1.5f, 1.5f, 1.5f);
 float projDiffuseRate = 1.0f;
 float dirDiffuseRate = 0.3f;
+float scaleRate = 0.0f;
 glm::vec3 pointAmbient  = glm::vec3(0.05f);
 glm::vec3 pointDiffuse  = glm::vec3(0.6f);
 glm::vec3 pointSpecular = glm::vec3(0.7f);
@@ -54,10 +55,13 @@ glm::vec3 projAmbient   = glm::vec3(0.05f);
 glm::vec3 projDiffuse   = glm::vec3(projDiffuseRate);
 glm::vec3 projSpecular  = glm::vec3(0.7f);
 glm::vec3 dirPosition   = glm::vec3(0.2f, -1.0f, -1.3f);
+glm::vec3 lampColor[NR_POINT_LIGHTS];
 
 bool flashlight = true;
 bool sun = true;
 bool lamps = true;
+bool enchantment = false;
+int post = 0;
 
 //Реализация нажатий
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -184,6 +188,7 @@ int main()
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f, 1.0f, 0.0f
     };
     
+    
     float floorVertices[] = {
         //Позиции               //Текстурные    //Нормали
          4.0f, -2.0f,  4.0f,    2.0f, 0.0f,     0.0f, 1.0f, 0.0f,
@@ -272,10 +277,10 @@ int main()
     
     //Сдвиги кубиков N_OBJECTS
     glm::vec3 cubePositions[] = {
-      glm::vec3( 0.0f,  7.0f,  0.0f),
-      glm::vec3( 2.0f,  5.0f, -15.0f),
-      glm::vec3(-1.5f, -2.2f, -2.5f),
-      glm::vec3(-3.8f, -2.0f, -12.3f),
+      glm::vec3( 0.0f,  5.0f,  0.0f),
+      glm::vec3( 2.0f,  3.0f, -2.7f),
+      glm::vec3(-1.5f, -2.8f, -2.5f),
+      glm::vec3(-3.8f, -2.0f,  1.5f),
       //glm::vec3( 2.4f, -1.5f, -3.5f),
       //glm::vec3(-1.7f,  3.0f, -7.5f),
       //glm::vec3( 1.3f, -2.0f, -2.5f),
@@ -285,10 +290,10 @@ int main()
     };
     
     glm::vec3 pointLightPositions[] = {
-        glm::vec3( 0.7f,  0.5f,  2.0f),
-        glm::vec3( 2.3f, -3.3f, -4.0f),
-        glm::vec3(-4.0f,  5.0f, -12.0f),
-        glm::vec3( 0.0f,  4.0f, -3.0f)
+        glm::vec3(-0.7f,   0.8f,   2.0f),
+        glm::vec3( 1.0f,  -2.7f,   1.0f),
+        glm::vec3( 0.0f,  -5.0f,   0.0f),
+        glm::vec3(-0.4f,   3.6f,  -3.0f)
     };
     
     /*
@@ -563,6 +568,8 @@ int main()
     
     //GLuint texObjectNorm = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/container2_normal.png");
     
+    GLuint texCoat = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/coat.png");
+    
     GLuint texWindow = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/shield.png");
     
     GLuint texObjectSpecular = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/container2_specular.png");
@@ -699,6 +706,25 @@ int main()
         mirrorShader.setMat4("model", model);
         //glDrawArrays(GL_TRIANGLES, 0, 36);
         
+        //Лампа
+        lampShader.Use();
+        lampShader.setMat4("view", view);
+        lampShader.setMat4("projection", projection);
+
+        glBindVertexArray(lampVAO);
+        for (int i = 0; i < NR_POINT_LIGHTS; i++)
+        {
+           float k = ((sin(3 * glfwGetTime() + i * 3.0) / 2) + 0.5);
+           lampColor[i] = k * glm::vec3(0.82f, 0.26f, 0.0f) + (1 - k) * glm::vec3(1.0f, 0.84f, 0.2f);
+           lampShader.setVec3("lampColor", lampColor[i]);
+           model = glm::mat4(1.0f);
+           model = glm::translate(model, pointLightPositions[i]);
+           model = glm::scale(model, glm::vec3(0.1f));
+           lampShader.setMat4("model", model);
+           glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+        glBindVertexArray(0);
+        
         //Пол
         ourShader.Use();
         
@@ -717,7 +743,7 @@ int main()
         
         //Точечный свет
         ourShader.setVec3("light[0].position", pointLightPositions[0]);
-        ourShader.setVec3("light[0].specular", pointSpecular);
+        ourShader.setVec3("light[0].specular", pointSpecular * lampColor[0]);
         ourShader.setVec3("light[0].ambient", pointAmbient);
         ourShader.setVec3("light[0].diffuse", pointDiffuse);
         ourShader.setFloat("light[0].constant", 1.0f);
@@ -725,7 +751,7 @@ int main()
         ourShader.setFloat("light[0].quadratic", 0.032f);
         
         ourShader.setVec3("light[1].position", pointLightPositions[1]);
-        ourShader.setVec3("light[1].specular", pointSpecular);
+        ourShader.setVec3("light[1].specular", pointSpecular * lampColor[1]);
         ourShader.setVec3("light[1].ambient", pointAmbient);
         ourShader.setVec3("light[1].diffuse", pointDiffuse);
         ourShader.setFloat("light[1].constant", 1.0f);
@@ -733,7 +759,7 @@ int main()
         ourShader.setFloat("light[1].quadratic", 0.032f);
         
         ourShader.setVec3("light[2].position", pointLightPositions[2]);
-        ourShader.setVec3("light[2].specular", pointSpecular);
+        ourShader.setVec3("light[2].specular", pointSpecular * lampColor[2]);
         ourShader.setVec3("light[2].ambient", pointAmbient);
         ourShader.setVec3("light[2].diffuse", pointDiffuse);
         ourShader.setFloat("light[2].constant", 1.0f);
@@ -741,7 +767,7 @@ int main()
         ourShader.setFloat("light[2].quadratic", 0.032f);
         
         ourShader.setVec3("light[3].position", pointLightPositions[3]);
-        ourShader.setVec3("light[3].specular", pointSpecular);
+        ourShader.setVec3("light[3].specular", pointSpecular * lampColor[3]);
         ourShader.setVec3("light[3].ambient", pointAmbient);
         ourShader.setVec3("light[3].diffuse", pointDiffuse);
         ourShader.setFloat("light[3].constant", 1.0f);
@@ -774,6 +800,7 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texObjectSpecular);
         //glActiveTexture(GL_TEXTURE2);
         //glBindTexture(GL_TEXTURE_2D, texObjectNorm);
+        
         GLfloat angle = 0.0f;
         for(GLuint i = 0; i < N_OBJECTS; i++)
         {
@@ -783,9 +810,26 @@ int main()
             model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
             ourShader.setMat4("model", model);
             ourShader.setBool("normal_mapping", false);
-
-          glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+        //Герб
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texCoat);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texCoat);
+        if ((scaleRate < 1) && (enchantment == true))
+            scaleRate += 0.003;
+        model = glm::mat4(1.0f);
+        model = glm::rotate(model, glm::radians(180.0f), up);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 6.0f));
+        model = glm::scale(model, glm::vec3(4.0f * scaleRate));
+        ourShader.setMat4("model", model);
+        ourShader.setFloat("shiftX", 0);
+        ourShader.setFloat("shiftY", 0);
+        ourShader.setFloat("shiftZ", 0);
+        ourShader.setBool("normal_mapping", false);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
         
         glBindVertexArray(quadBrickVAO);
         //Текстура
@@ -818,6 +862,7 @@ int main()
         ourShader.setFloat("shiftZ", 0.0f);
         ourShader.setBool("normal_mapping", false);
         glDrawArrays(GL_TRIANGLES, 0, 12);
+        glBindVertexArray(0);
         
         //Травка
         shader.Use();
@@ -832,7 +877,7 @@ int main()
         {
             model = glm::mat4(1.0f);
             //model = glm::translate(model, it->second);
-            model = glm::translate(model, glm::vec3(0.0f));
+            //model = glm::translate(model, glm::vec3(0.0f));
             angle = (GLfloat)glfwGetTime() * 10.0f * it->second;//glm::radians(10.0f);
             model = glm::rotate(model, glm::radians((angle + 90.0f)), up);
             angle *= 0.01745;
@@ -846,20 +891,6 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
         
-        //Лампа
-        lampShader.Use();
-        lampShader.setMat4("view", view);
-        lampShader.setMat4("projection", projection);
-        
-        glBindVertexArray(lampVAO);
-        for (int i = 0; i < NR_POINT_LIGHTS; i++)
-        {
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, pointLightPositions[i]);
-            model = glm::scale(model, glm::vec3(0.1f));
-            lampShader.setMat4("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
         glBindVertexArray(0);
         
         // второй проход
@@ -869,6 +900,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         
         screenShader.Use();
+        screenShader.setInt("post", post);
         glBindVertexArray(quadVAO);
         glBindTexture(GL_TEXTURE_2D, texColorBuffer);
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -982,6 +1014,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             flashlight = true;
         }
     }
+    
+    if(key == GLFW_KEY_E && action == GLFW_PRESS)
+    {
+        enchantment = true;
+        post = (post + 1) % 4;
+    }
 }
 
 void doMovement()
@@ -1030,6 +1068,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     front.y = sin(glm::radians(pitch));
     front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
     cameraFront = glm::normalize(front);
+    
+    
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
