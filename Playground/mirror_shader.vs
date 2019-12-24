@@ -12,7 +12,9 @@ out vec2 TexCoord;
 out vec3 Normal;
 //out vec3 worldPosition;
 
-//uniform float shiftX;
+uniform float shiftX;
+uniform float shiftY;
+uniform float shiftZ;
 //uniform mat4 transform;
 uniform mat4 model;
 uniform mat4 view;
@@ -20,7 +22,7 @@ uniform mat4 projection;
 
 void main()
 {
-    gl_Position = projection * view * model * vec4(position, 1.0); //+shiftX
+    gl_Position = projection * view * model * vec4(position[0] + shiftX, position[1] + shiftY, position[2] + shiftZ, 1.0); //+shiftX
     //Normal = normal;
     Position = vec3(model * vec4(position, 1.0f));
     Normal = mat3(transpose(inverse(model))) * normal;

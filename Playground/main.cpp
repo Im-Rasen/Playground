@@ -46,8 +46,8 @@ float projDiffuseRate = 1.0f;
 float dirDiffuseRate = 0.3f;
 float scaleRate = 0.0f;
 glm::vec3 pointAmbient  = glm::vec3(0.05f);
-glm::vec3 pointDiffuse  = glm::vec3(0.6f);
-glm::vec3 pointSpecular = glm::vec3(0.7f);
+glm::vec3 pointDiffuse  = glm::vec3(0.5f);
+glm::vec3 pointSpecular = glm::vec3(0.6f);
 glm::vec3 dirAmbient    = glm::vec3(0.05f);
 glm::vec3 dirDiffuse    = glm::vec3(dirDiffuseRate);
 glm::vec3 dirSpecular   = glm::vec3(0.4f);
@@ -188,6 +188,24 @@ int main()
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,  0.0f, 1.0f, 0.0f
     };
     
+    float coatVertices[] = {
+        // Позиции           // Текстурные // Нормали
+        -0.5f, -0.5f,  1.0f,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f,
+         0.5f, -0.5f,  1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,
+         0.5f,  0.5f,  1.0f,  1.0f, 1.0f,  0.0f, 0.0f, 1.0f,
+        
+         0.5f,  0.5f,  1.0f,  1.0f, 1.0f,  0.0f, 0.0f, 1.0f,
+        -0.5f,  0.5f,  1.0f,  0.0f, 1.0f,  0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f,  1.0f,  0.0f, 0.0f,  0.0f, 0.0f, 1.0f,
+        
+        -0.5f, -0.5f,  0.999f,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+         0.5f, -0.5f,  0.999f,  1.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+         0.5f,  0.5f,  0.999f,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f,
+        
+         0.5f,  0.5f,  0.999f,  1.0f, 1.0f,  0.0f, 0.0f, -1.0f,
+        -0.5f,  0.5f,  0.999f,  0.0f, 1.0f,  0.0f, 0.0f, -1.0f,
+        -0.5f, -0.5f,  0.999f,  0.0f, 0.0f,  0.0f, 0.0f, -1.0f,
+    };
     
     float floorVertices[] = {
         //Позиции               //Текстурные    //Нормали
@@ -421,6 +439,26 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(floorVertices), floorVertices, GL_STATIC_DRAW);
     glBindVertexArray(floorVAO);
+    //Устанавливаем указатели на вершинные атрибуты //location = 0, vec3,,normalize,step_between_data_packs,смещение_начала_данных
+    // Атрибут с координатами
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+    glEnableVertexAttribArray(0);
+    // Атрибут с текстурой
+    glVertexAttribPointer(1, 2, GL_FLOAT,GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
+    //Атрибут с нормалью
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2);
+    
+    //Герб
+    GLuint coatVAO;
+    glGenVertexArrays(1, &coatVAO);
+    
+    GLuint coatVBO;
+    glGenBuffers(1, &coatVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, coatVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(coatVertices), coatVertices, GL_STATIC_DRAW);
+    glBindVertexArray(coatVAO);
     //Устанавливаем указатели на вершинные атрибуты //location = 0, vec3,,normalize,step_between_data_packs,смещение_начала_данных
     // Атрибут с координатами
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
@@ -697,14 +735,21 @@ int main()
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
         //Куб 1
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+        model = glm::translate(model, glm::vec3(-1.0f, -3.5f, 2.2f));
         mirrorShader.setMat4("model", model);
-        //glDrawArrays(GL_TRIANGLES, 0, 36);
+        mirrorShader.setFloat("shiftX", 0.0f);
+        mirrorShader.setFloat("shiftY", 0.0f);
+        mirrorShader.setFloat("shiftZ", 0.0f);
+        if (enchantment)
+            glDrawArrays(GL_TRIANGLES, 0, 36);
         //Куб2
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(2.0f, -3.5f, 2.5f));
         mirrorShader.setMat4("model", model);
-        //glDrawArrays(GL_TRIANGLES, 0, 36);
+        mirrorShader.setFloat("shiftX", 0.0f);
+        mirrorShader.setFloat("shiftZ", 0.0f);
+        if (enchantment)
+            glDrawArrays(GL_TRIANGLES, 0, 36);
         
         //Лампа
         lampShader.Use();
@@ -809,9 +854,14 @@ int main()
             angle = (GLfloat)glfwGetTime() * glm::radians(15.0f + i*10.0f);
             model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
             ourShader.setMat4("model", model);
+            ourShader.setFloat("shiftX", 0.0f);
+            ourShader.setFloat("shiftY", 0.0f);
+            ourShader.setFloat("shiftZ", 0.0f);
             ourShader.setBool("normal_mapping", false);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+        
+        glBindVertexArray(coatVAO);
         //Герб
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texCoat);
@@ -820,17 +870,18 @@ int main()
         if ((scaleRate < 1) && (enchantment == true))
             scaleRate += 0.003;
         model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(180.0f), up);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 6.0f));
-        model = glm::scale(model, glm::vec3(4.0f * scaleRate));
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -4.0f));
+        model = glm::scale(model, glm::vec3(2.0f * scaleRate));
         ourShader.setMat4("model", model);
+        float shiftY = 0.04 * cos(glfwGetTime());
         ourShader.setFloat("shiftX", 0);
-        ourShader.setFloat("shiftY", 0);
+        ourShader.setFloat("shiftY", shiftY);
         ourShader.setFloat("shiftZ", 0);
         ourShader.setBool("normal_mapping", false);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, 12);
         glBindVertexArray(0);
         
+        //Кирпичная стена
         glBindVertexArray(quadBrickVAO);
         //Текстура
         glActiveTexture(GL_TEXTURE0);
@@ -843,7 +894,14 @@ int main()
         //model = glm::scale(model, glm::vec3(4.0f));
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, -4.0f));
         ourShader.setMat4("model", model);
+        ourShader.setFloat("shiftX", 0.0f);
+        ourShader.setFloat("shiftY", 0.0f);
+        ourShader.setFloat("shiftZ", 0.0f);
         ourShader.setBool("normal_mapping", true);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        model = glm::rotate(model, glm::radians(90.0f),up);
+        model = glm::translate(model, glm::vec3(-4.0f, 0.0f, -4.0f));
+        ourShader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
         
@@ -860,6 +918,7 @@ int main()
         ourShader.setFloat("shiftX", 0.0f);
         ourShader.setFloat("shiftY", 0.0f);
         ourShader.setFloat("shiftZ", 0.0f);
+        
         ourShader.setBool("normal_mapping", false);
         glDrawArrays(GL_TRIANGLES, 0, 12);
         glBindVertexArray(0);

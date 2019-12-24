@@ -24,11 +24,11 @@ void main()
     
     switch (post) {
             
-        case 1:
+        case 2:
             color = vec4(vec3(1.0 - texture(screenTexture, TexCoord)), 1.0); // Инверсия цвета
             break;
             
-        case 2:
+        case 3:
             //Размытие
             float kernel[9] = float[](
                 1.0 / 16, 2.0 / 16, 1.0 / 16,
@@ -48,7 +48,7 @@ void main()
             color = vec4(col, 1.0);
             break;
             
-        case 3:
+        case 1:
             //Серый
             vec4 midColor = texture(screenTexture, TexCoord);
             float average = (0.2126 * midColor.r + 0.7152 * midColor.g + 0.0722 * midColor.b) / 3.0;

@@ -31,7 +31,7 @@ void main()
     vec3 N = normalize(vec3(model * vec4(normal,    0.0)));
     TBN = mat3(T, B, N);
     
-    gl_Position = projection * view * model *vec4(position[0] + shiftX, position[1] + shiftY, position[2] + shiftZ, 1.0);
+    gl_Position = projection * view * model * vec4(position[0] + shiftX, position[1] + shiftY, position[2] + shiftZ, 1.0);
     //Normal = normal;
     worldPosition = vec3(model * vec4(position, 1.0f));
     Normal = mat3(transpose(inverse(model))) * normal;
