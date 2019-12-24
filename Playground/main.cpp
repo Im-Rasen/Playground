@@ -3,6 +3,7 @@
 #define GLEW_STATIC
 #define cimg_use_jpeg
 #define NR_POINT_LIGHTS 4
+#define N_OBJECTS 4
 
 #include <iostream>
 #include <math.h>
@@ -52,7 +53,7 @@ glm::vec3 dirSpecular   = glm::vec3(0.4f);
 glm::vec3 projAmbient   = glm::vec3(0.05f);
 glm::vec3 projDiffuse   = glm::vec3(projDiffuseRate);
 glm::vec3 projSpecular  = glm::vec3(0.7f);
-glm::vec3 dirPosition   = glm::vec3(0.2f, -1.0f, 0.3f);
+glm::vec3 dirPosition   = glm::vec3(0.2f, -1.0f, -1.3f);
 
 bool flashlight = true;
 bool sun = true;
@@ -185,21 +186,21 @@ int main()
     
     float floorVertices[] = {
         //Позиции               //Текстурные    //Нормали
-         5.0f, -0.5f,  5.0f,    2.0f, 0.0f,     0.0f, 1.0f, 0.0f,
-        -5.0f, -0.5f,  5.0f,    0.0f, 0.0f,     0.0f, 1.0f, 0.0f,
-        -5.0f, -0.5f, -5.0f,    0.0f, 2.0f,     0.0f, 1.0f, 0.0f,
+         4.0f, -2.0f,  4.0f,    2.0f, 0.0f,     0.0f, 1.0f, 0.0f,
+        -4.0f, -2.0f,  4.0f,    0.0f, 0.0f,     0.0f, 1.0f, 0.0f,
+        -4.0f, -2.0f, -4.0f,    0.0f, 2.0f,     0.0f, 1.0f, 0.0f,
 
-         5.0f, -0.5f,  5.0f,    2.0f, 0.0f,     0.0f, 1.0f, 0.0f,
-        -5.0f, -0.5f, -5.0f,    0.0f, 2.0f,     0.0f, 1.0f, 0.0f,
-         5.0f, -0.5f, -5.0f,    2.0f, 2.0f,     0.0f, 1.0f, 0.0f,
+         4.0f, -2.0f,  4.0f,    2.0f, 0.0f,     0.0f, 1.0f, 0.0f,
+        -4.0f, -2.0f, -4.0f,    0.0f, 2.0f,     0.0f, 1.0f, 0.0f,
+         4.0f, -2.0f, -4.0f,    2.0f, 2.0f,     0.0f, 1.0f, 0.0f,
         //Пытаюсь сделать пол двусторонним
-         5.0f, -0.501f,  5.0f,    2.0f, 0.0f,     0.0f, -1.0f, 0.0f,
-        -5.0f, -0.501f,  5.0f,    0.0f, 0.0f,     0.0f, -1.0f, 0.0f,
-        -5.0f, -0.501f, -5.0f,    0.0f, 2.0f,     0.0f, -1.0f, 0.0f,
+         4.0f, -2.001f,  4.0f,    2.0f, 0.0f,     0.0f, -1.0f, 0.0f,
+        -4.0f, -2.001f,  4.0f,    0.0f, 0.0f,     0.0f, -1.0f, 0.0f,
+        -4.0f, -2.001f, -4.0f,    0.0f, 2.0f,     0.0f, -1.0f, 0.0f,
 
-         5.0f, -0.501f,  5.0f,    2.0f, 0.0f,     0.0f, -1.0f, 0.0f,
-        -5.0f, -0.501f, -5.0f,    0.0f, 2.0f,     0.0f, -1.0f, 0.0f,
-         5.0f, -0.501f, -5.0f,    2.0f, 2.0f,     0.0f, -1.0f, 0.0f
+         4.0f, -2.001f,  4.0f,    2.0f, 0.0f,     0.0f, -1.0f, 0.0f,
+        -4.0f, -2.001f, -4.0f,    0.0f, 2.0f,     0.0f, -1.0f, 0.0f,
+         4.0f, -2.001f, -4.0f,    2.0f, 2.0f,     0.0f, -1.0f, 0.0f
     };
     
     float opacityVertices[] = {
@@ -269,18 +270,18 @@ int main()
          1.0f, -1.0f,  1.0f
     };
     
-    //Сдвиги кубиков
+    //Сдвиги кубиков N_OBJECTS
     glm::vec3 cubePositions[] = {
       glm::vec3( 0.0f,  7.0f,  0.0f),
       glm::vec3( 2.0f,  5.0f, -15.0f),
       glm::vec3(-1.5f, -2.2f, -2.5f),
       glm::vec3(-3.8f, -2.0f, -12.3f),
-      glm::vec3( 2.4f, -1.5f, -3.5f),
-      glm::vec3(-1.7f,  3.0f, -7.5f),
-      glm::vec3( 1.3f, -2.0f, -2.5f),
-      glm::vec3( 1.5f,  2.0f, -2.5f),
-      glm::vec3( 1.5f,  1.8f, -1.5f),
-      glm::vec3(-1.3f,  1.4f, -1.5f)
+      //glm::vec3( 2.4f, -1.5f, -3.5f),
+      //glm::vec3(-1.7f,  3.0f, -7.5f),
+      //glm::vec3( 1.3f, -2.0f, -2.5f),
+      //glm::vec3( 1.5f,  2.0f, -2.5f),
+      //glm::vec3( 1.5f,  1.8f, -1.5f),
+      //glm::vec3(-1.3f,  1.4f, -1.5f)
     };
     
     glm::vec3 pointLightPositions[] = {
@@ -290,27 +291,38 @@ int main()
         glm::vec3( 0.0f,  4.0f, -3.0f)
     };
     
+    /*
     //Позиции окошек
     std::vector<glm::vec3> windows
     {
-        glm::vec3(-1.5f,  0.0f, -0.48f),
-        glm::vec3( 1.5f,  0.0f,  0.51f),
-        glm::vec3( 0.0f,  0.0f,  0.7f),
-        glm::vec3(-0.3f,  0.0f, -2.3f),
-        glm::vec3( 0.5f,  0.0f, -0.6f)
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 0.0f,  0.0f,  0.0f)
+    };
+     */
+    //Радиусы вращения окошек
+    std::vector<float> windowsRadius
+    {
+        (float) (3.9f),
+        (float) (4.2f),
+        (float) (4.5f),
+        (float) (4.8f),
+        (float) (5.1f),
+        (float) (5.4f)
     };
     
     //Нормал маппинг
     // координаты вершин
-    glm::vec3 pos1(-1.0,  1.0, 0.0);
-    glm::vec3 pos2(-1.0, -1.0, 0.0);
-    glm::vec3 pos3( 1.0, -1.0, 0.0);
-    glm::vec3 pos4( 1.0,  1.0, 0.0);
+    glm::vec3 pos1(-4.0,  4.0, 0.0);
+    glm::vec3 pos2(-4.0, -4.0, 0.0);
+    glm::vec3 pos3( 4.0, -4.0, 0.0);
+    glm::vec3 pos4( 4.0,  4.0, 0.0);
     // текстурные координаты
-    glm::vec2 uv1(0.0, 1.0);
+    glm::vec2 uv1(0.0, 3.0);
     glm::vec2 uv2(0.0, 0.0);
-    glm::vec2 uv3(1.0, 0.0);
-    glm::vec2 uv4(1.0, 1.0);
+    glm::vec2 uv3(3.0, 0.0);
+    glm::vec2 uv4(3.0, 3.0);
     // вектор нормали
     glm::vec3 nm(0.0, 0.0, 1.0);
     
@@ -547,15 +559,15 @@ int main()
     //___Текстуры___
     GLuint texObject = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/container2.png");
 
-    GLuint texFloor = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/wood.png");
+    GLuint texFloor = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/sand.png");
     
-    GLuint texObjectNorm = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/container2_normal.png");
+    //GLuint texObjectNorm = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/container2_normal.png");
     
-    GLuint texWindow = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/window.png");
+    GLuint texWindow = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/shield.png");
     
     GLuint texObjectSpecular = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/container2_specular.png");
     
-    GLuint texFloorSpecular = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/wood_specular.png");
+    GLuint texFloorSpecular = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/sand_spec.png");
     
     GLuint diffuseBrick = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/brickwall.png");
     /*
@@ -633,11 +645,11 @@ int main()
         glDepthMask(GL_TRUE);
         
         //Сортировка по расстоянию до наблюдателя прозрачных объектов
-        std::map<float, glm::vec3> sorted;
-        for (unsigned int i = 0; i < windows.size(); i++)
+        std::map<GLfloat, GLfloat> sorted; //vec3
+        for (unsigned int i = 0; i < windowsRadius.size(); i++)
         {
-            float distance = glm::length(cameraPosition - windows[i]);
-            sorted[distance] = windows[i];
+            float distance = glm::length(cameraPosition - windowsRadius[i]); //windows
+            sorted[distance] = windowsRadius[i]; //windows
         }
 
         //Шейдер
@@ -754,33 +766,40 @@ int main()
         ourShader.setMat4("projection", projection);
         
        
-        glBindVertexArray(quadBrickVAO);
+        glBindVertexArray(objectVAO);
         //Текстура
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texObject);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texObjectSpecular);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, texObjectNorm);
-        for(GLuint i = 0; i < 10; i++)
+        //glActiveTexture(GL_TEXTURE2);
+        //glBindTexture(GL_TEXTURE_2D, texObjectNorm);
+        GLfloat angle = 0.0f;
+        for(GLuint i = 0; i < N_OBJECTS; i++)
         {
             glm::mat4 model(1.0f);
             model = glm::translate(model, cubePositions[i]);
-            GLfloat angle = (GLfloat)glfwGetTime() * glm::radians(15.0f + i*10.0f);
-            //model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
+            angle = (GLfloat)glfwGetTime() * glm::radians(15.0f + i*10.0f);
+            model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
             ourShader.setMat4("model", model);
+            ourShader.setBool("normal_mapping", false);
 
           glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         
         glBindVertexArray(quadBrickVAO);
-        ourShader.setMat4("model", glm::mat4(1.0f));
+        //Текстура
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseBrick);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, diffuseBrick);
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, normalBrick);
+        model = glm::mat4(1.0f);
+        //model = glm::scale(model, glm::vec3(4.0f));
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -4.0f));
+        ourShader.setMat4("model", model);
+        ourShader.setBool("normal_mapping", true);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
         
@@ -789,13 +808,16 @@ int main()
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texFloor);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texFloor);
+        glBindTexture(GL_TEXTURE_2D, texFloorSpecular);
         //Пол 1
-        ourShader.setMat4("model", glm::mat4(1.0f));
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+        ourShader.setMat4("model", model);
         ourShader.setFloat("shiftX", 0.0f);
         ourShader.setFloat("shiftY", 0.0f);
         ourShader.setFloat("shiftZ", 0.0f);
-        //glDrawArrays(GL_TRIANGLES, 0, 12);
+        ourShader.setBool("normal_mapping", false);
+        glDrawArrays(GL_TRIANGLES, 0, 12);
         
         //Травка
         shader.Use();
@@ -806,11 +828,21 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texWindow);
         //glActiveTexture(GL_TEXTURE1);
         //glBindTexture(GL_TEXTURE_2D, texWindow);
-        for(std::map<float,glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
+        for(std::map<GLfloat,GLfloat>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it) //vec3 вместо float
         {
             model = glm::mat4(1.0f);
-            model = glm::translate(model, it->second);
+            //model = glm::translate(model, it->second);
+            model = glm::translate(model, glm::vec3(0.0f));
+            angle = (GLfloat)glfwGetTime() * 10.0f * it->second;//glm::radians(10.0f);
+            model = glm::rotate(model, glm::radians((angle + 90.0f)), up);
+            angle *= 0.01745;
             shader.setMat4("model", model);
+            float shiftX = cameraPosition[0] + it->second * (cos(angle));
+            float shiftY = cameraPosition[1];
+            float shiftZ = cameraPosition[2] - it->second * (sin(angle));
+            shader.setFloat("shiftX", shiftX);
+            shader.setFloat("shiftY", shiftY);
+            shader.setFloat("shiftZ", shiftZ);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
         
@@ -1062,8 +1094,8 @@ unsigned int loadTexture(std::string address) //mirrored repeat, linear
     glBindTexture(GL_TEXTURE_2D, textureID);
     
     //Параметры семплинга
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
        
     //Параметры МипМапов
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//GL_LINEAR_MIPMAP_LINEAR / GL_LINEAR / GL_NEAREST

@@ -62,6 +62,7 @@ uniform ProjectLight projLight;
 
 uniform vec3 viewPosition;
 uniform sampler2D normalMap;
+uniform bool normal_mapping;
 
 
 vec3 CalcDirLight(DirectLight dirLight, vec3 norm, vec3 viewDirection);
@@ -79,11 +80,14 @@ void main()
     
             //vec3 lightDir   = normalize(lightPos - FragPos);
             //vec3 halfwayDir = normalize(lightDir + viewDir);
-    
-    //vec3 norm = normalize(Normal);
-    vec3 norm = texture(normalMap, TexCoord).rgb;
-    norm = normalize(norm * 2.0 - 1.0); // [0.1] -> [-1,1]
-    norm = normalize(TBN * norm);
+    vec3 norm;
+    if (normal_mapping) {
+        norm = texture(normalMap, TexCoord).rgb;
+        norm = normalize(norm * 2.0 - 1.0); // [0.1] -> [-1,1]
+        norm = normalize(TBN * norm);
+    }
+    else
+        norm = normalize(Normal);
     
     
     vec3 viewDirection = normalize(viewPosition - worldPosition);

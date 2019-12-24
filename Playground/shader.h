@@ -111,6 +111,11 @@ public:
         GLuint nameLocation = glGetUniformLocation(this->Program, name.c_str());
         glUniform1i(nameLocation, value);
     }
+    void setBool(const std::string &name, bool value) const
+    {
+        GLuint nameLocation = glGetUniformLocation(this->Program, name.c_str());
+        glUniform1i(nameLocation, value);
+    }
     void setFloat(const std::string &name, float value) const
     {
         GLuint nameLocation = glGetUniformLocation(this->Program, name.c_str());
