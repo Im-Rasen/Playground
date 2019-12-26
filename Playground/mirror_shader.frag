@@ -19,4 +19,5 @@ void main()
     vec3 R = reflect(I, normalize(Normal));
     vec3 brightness = sunBright;// + lampBright;
     color = vec4(texture(cubemap, R).rgb, 1.0) * vec4(brightness, 1.0);
+    //color = vec4(texture(cubemap, I).rgb, 1.0) * vec4(brightness, 1.0);
 }

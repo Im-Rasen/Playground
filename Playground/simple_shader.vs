@@ -22,7 +22,8 @@ void main()
     //some = vec4(some[0] + shiftX, some[1] + shiftY, some[2] + shiftZ, 1.0f);
     //gl_Position = projection * view * some; //+shiftX
     //gl_Position = projection * view * model * vec4(position[0] + shiftX, position[1] + shiftY, position[2] + shiftZ, 1.0);
-    gl_Position = projection * view * model * vec4(position, 1.0);
+    vec3 positionFollow = inverse(mat3(view))*position;
+    gl_Position = projection * view * model * vec4(positionFollow, 1.0);
     //worldPosition = vec3(model * vec4(position, 1.0f));
     //Normal = mat3(transpose(inverse(model))) * normal;
     TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);

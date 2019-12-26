@@ -131,6 +131,7 @@ int main()
     //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     //Режим смешивания
     glEnable(GL_BLEND);
+    //GL_CLAMP_TO_EDGE - решим повторения текстуры, если прозрачная
     //Прозрачность источника - для источника, 1-прозрачность источника - для приемника
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     //glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
@@ -517,7 +518,7 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
     
-    //Квад
+    //Квадрат
     GLuint quadVAO;
     glGenVertexArrays(1, &quadVAO);
     GLuint quadVBO;
@@ -534,7 +535,7 @@ int main()
     glEnableVertexAttribArray(1);
     glBindVertexArray(0);
     
-    // Квад нормал маппинг
+    // Квадрат нормал маппинг
     GLuint quadBrickVAO;
     glGenVertexArrays(1, &quadBrickVAO);
     GLuint quadBrickVBO;
@@ -681,7 +682,7 @@ int main()
         glEnable(GL_DEPTH_TEST);
         
         //Скайбокс
-        glDepthMask(GL_FALSE);
+        glDepthMask(GL_FALSE); //нет записи в буфер глубины
         skyShader.Use();
         skyShader.setVec3("brightness", dirDiffuse);
         //Видовая

@@ -165,7 +165,7 @@ vec3 CalcProjLight(ProjectLight projLight, vec3 norm, vec3 worldPosition, vec3 v
     
     float theta = dot(projLightDirection, normalize(-projLight.direction));
     float epsilon = projLight.cutOff - projLight.outerCutOff;
-    float projIntensity = clamp((theta - projLight.outerCutOff) / epsilon, 0.0, 1.0);
+    float projIntensity = clamp((theta - projLight.outerCutOff) / epsilon, 0.0, 1.0);//ограничивает область значений своего первого параметра значениями второго и третьего параметров
     
     if(theta > projLight.outerCutOff) // cos
     {
