@@ -316,16 +316,17 @@ int main()
         glm::vec3(-0.4f,   3.6f,  -3.0f)
     };
     
-    /*
+    
     //Позиции окошек
     std::vector<glm::vec3> windows
     {
-        glm::vec3( 0.0f,  0.0f,  0.0f),
-        glm::vec3( 0.0f,  0.0f,  0.0f),
-        glm::vec3( 0.0f,  0.0f,  0.0f),
-        glm::vec3( 0.0f,  0.0f,  0.0f)
+        glm::vec3(-1.5f,  0.0f, -0.48f),
+        glm::vec3( 1.5f,  0.0f,  0.51f),
+        glm::vec3( 0.0f,  0.0f,  0.7f),
+        glm::vec3(-0.3f,  0.0f, -2.3f),
+        glm::vec3( 0.5f,  0.0f, -0.6f)
     };
-     */
+    /*
     //Радиусы вращения окошек
     std::vector<float> windowsRadius
     {
@@ -336,7 +337,7 @@ int main()
         (float) (5.1f),
         (float) (5.4f)
     };
-    
+    */
     //Нормал маппинг
     // координаты вершин
     glm::vec3 pos1(-4.0,  4.0, 0.0);
@@ -465,6 +466,25 @@ int main()
     //Атрибут с нормалью
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
     glEnableVertexAttribArray(2);
+    
+    /*
+    GLuint brickVAO;
+    glGenVertexArrays(1, &brickVAO);
+    GLuint brickVBO;
+    glGenBuffers(1, &bricksVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, brickVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(brickVertices), brickVertices, GL_STATIC_DRAW);
+    glBindVertexArray(brickVAO);
+    // Атрибут с координатами
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+    glEnableVertexAttribArray(0);
+    // Атрибут с текстурой
+    glVertexAttribPointer(1, 2, GL_FLOAT,GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
+    //Атрибут с нормалью
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2);
+     */
     
     //Полупрозрачные (щиты)
     GLuint opacityVAO;
@@ -681,6 +701,16 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glDepthMask(GL_TRUE);
         
+        
+        //Сортировка по расстоянию до наблюдателя прозрачных объектов
+        std::map<float, glm::vec3> sorted;
+        for (unsigned int i = 0; i < windows.size(); i++)
+        {
+            float distance = glm::length(cameraPosition - windows[i]);
+            sorted[distance] = windows[i];
+        }
+        
+        /*
         //Сортировка по расстоянию до наблюдателя прозрачных объектов
         std::map<GLfloat, GLfloat> sorted; //vec3
         for (unsigned int i = 0; i < windowsRadius.size(); i++)
@@ -688,6 +718,7 @@ int main()
             float distance = glm::length(cameraPosition - windowsRadius[i]); //windows
             sorted[distance] = windowsRadius[i]; //windows
         }
+         */
 
         //Шейдер
         
@@ -933,6 +964,23 @@ int main()
             glBindTexture(GL_TEXTURE_2D, texWindow);
             //glActiveTexture(GL_TEXTURE1);
             //glBindTexture(GL_TEXTURE_2D, texWindow);
+            for(std::map<float,glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
+            {
+                model = glm::mat4(1.0f);
+                model = glm::translate(model, it->second);
+                shader.setMat4("model", model);
+                glDrawArrays(GL_TRIANGLES, 0, 6);
+            }
+            
+            /*
+            shader.Use();
+            shader.setMat4("view", view);
+            shader.setMat4("projection", projection);
+            glBindVertexArray(opacityVAO);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, texWindow);
+            //glActiveTexture(GL_TEXTURE1);
+            //glBindTexture(GL_TEXTURE_2D, texWindow);
             for(std::map<GLfloat,GLfloat>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it) //vec3 вместо float
             {
                 model = glm::mat4(1.0f);
@@ -948,8 +996,11 @@ int main()
                 shader.setFloat("shiftX", shiftX);
                 shader.setFloat("shiftY", shiftY);
                 shader.setFloat("shiftZ", shiftZ);
-                glDrawArrays(GL_TRIANGLES, 0, 6);
+                
+                
             }
+             */
+        glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);
         }
         

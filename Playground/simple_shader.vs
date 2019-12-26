@@ -12,16 +12,17 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-uniform float shiftX;
-uniform float shiftY;
-uniform float shiftZ;
+//uniform float shiftX;
+//uniform float shiftY;
+//uniform float shiftZ;
 
 void main()
 {
-    vec4 some = model * vec4(position, 1.0);
-    some = vec4(some[0] + shiftX, some[1] + shiftY, some[2] + shiftZ, 1.0f);
-    gl_Position = projection * view * some; //+shiftX
+    //vec4 some = model * vec4(position, 1.0);
+    //some = vec4(some[0] + shiftX, some[1] + shiftY, some[2] + shiftZ, 1.0f);
+    //gl_Position = projection * view * some; //+shiftX
     //gl_Position = projection * view * model * vec4(position[0] + shiftX, position[1] + shiftY, position[2] + shiftZ, 1.0);
+    gl_Position = projection * view * model * vec4(position, 1.0);
     //worldPosition = vec3(model * vec4(position, 1.0f));
     //Normal = mat3(transpose(inverse(model))) * normal;
     TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);

@@ -13,6 +13,8 @@ layout (location = 4) in vec3 bitangent;
 out vec2 TexCoord;
 out vec3 Normal;
 out vec3 worldPosition;
+out vec3 tangentViewPosition;
+out vec3 tangentPosition;
 out mat3 TBN;
 
 uniform float shiftX;
@@ -22,6 +24,7 @@ uniform float shiftZ;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform vec3 viewPosition;
 
 void main()
 {
@@ -38,4 +41,6 @@ void main()
     //ourColor = color; // Значение цвета от вершинных данных
     //"vertexColor = vec4(0.5f, 0.0f, 0.0f, 1.0f);"
     TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);
+    tangentPosition = TBN * worldPosition;
+    tangentViewPosition = TBN * viewPosition;
 }

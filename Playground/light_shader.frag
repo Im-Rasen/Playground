@@ -6,6 +6,8 @@ out vec4 color;
 in vec2 TexCoord;
 in vec3 Normal;
 in vec3 worldPosition; // Позиция текущего фрагмента
+in vec3 tangentViewPosition;
+in vec3 tangentPosition;
 in mat3 TBN;
 
 
