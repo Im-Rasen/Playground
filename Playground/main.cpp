@@ -41,6 +41,7 @@ GLfloat lastY;
 bool firstMouse = true;
 GLfloat fov = 45.0f;
 //Освещение
+float heightScale = 0.1;
 //glm::vec3 lightPosition(1.5f, 1.5f, 1.5f);
 float projDiffuseRate = 1.0f;
 float dirDiffuseRate = 0.3f;
@@ -142,6 +143,7 @@ int main()
     Shader mirrorShader("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/mirror_shader.vs", "/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/mirror_shader.frag");
     Shader shader("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/simple_shader.vs","/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/simple_shader.frag");
     Shader lampShader("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/lamp_shader.vs","/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/lamp_shader.frag");
+    Shader parallaxShader("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/parallax_shader.vs","/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/parallax_shader.frag");
     
     //Куб
     float vertices[] = {
@@ -631,6 +633,12 @@ int main()
     GLuint specBrick = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/brickwall_spec.png");
     */
     GLuint normalBrick = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/brickwall_normal.png");
+    
+    GLuint diffuseMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/pavement.png");
+    
+    GLuint normalMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/pavement_normal.png");
+    
+    GLuint depthMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/pavement_depth2.png");
 
     //Кубическая карта
     std::vector<std::string> faces
@@ -783,8 +791,8 @@ int main()
         for (int i = 0; i < NR_POINT_LIGHTS; i++)
         {
             float k = ((sin(3 * glfwGetTime() + i * 3.0) / 2) + 0.5);
-            //lampColor[i] = k * glm::vec3(0.82f, 0.26f, 0.0f) + (1 - k) * glm::vec3(1.0f, 0.84f, 0.2f);
-            lampColor[i] = k * glm::vec3(1.0f, 0.0f, 0.0f) + (1 - k) * glm::vec3(0.8f, 0.6f, 0.5f);
+            lampColor[i] = k * glm::vec3(0.82f, 0.26f, 0.0f) + (1 - k) * glm::vec3(1.0f, 0.84f, 0.2f);
+            //lampColor[i] = k * glm::vec3(1.0f, 0.0f, 0.0f) + (1 - k) * glm::vec3(0.8f, 0.6f, 0.5f);
             lampShader.setVec3("lampColor", lampColor[i]);
             model = glm::mat4(1.0f);
             model = glm::translate(model, pointLightPositions[i]);
@@ -792,9 +800,9 @@ int main()
             lampShader.setMat4("model", model);
             k = sin(glfwGetTime());
             float shift = (-3.0f * k + (1 - k) * 3.0f);
-            lampShader.setFloat("shiftX", shift);
+            lampShader.setFloat("shiftX", 0.0f);
             lampShader.setFloat("shiftY", shift);
-            lampShader.setFloat("shiftZ", shift);
+            lampShader.setFloat("shiftZ", 0.0f);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         glBindVertexArray(0);
@@ -950,6 +958,39 @@ int main()
         
         ourShader.setBool("normal_mapping", false);
         glDrawArrays(GL_TRIANGLES, 0, 12);
+        glBindVertexArray(0);
+        
+        //Parallax
+        parallaxShader.Use();
+        //parallaxShader.setVec3("lightPosition[0]", pointLightPositions[0]);
+        //parallaxShader.setVec3("lightPosition[1]", pointLightPositions[1]);
+        //parallaxShader.setVec3("lightPosition[2]", pointLightPositions[2]);
+        //parallaxShader.setVec3("lightPosition[3]", pointLightPositions[3]);
+        parallaxShader.setVec3("lightPosition", pointLightPositions[2]);
+        parallaxShader.setVec3("viewPosition", cameraPosition);
+        parallaxShader.setFloat("heightScale", heightScale);
+        parallaxShader.setInt("diffuseMap", 0);
+        parallaxShader.setInt("normalMap", 1);
+        parallaxShader.setInt("depthMap", 2);
+        glBindVertexArray(quadBrickVAO);
+        //Текстура
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseMap);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, normalMap);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        model = glm::mat4(1.0f);
+        //model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(2.5f, -3.0f, -2.5f));
+        
+        parallaxShader.setMat4("view", view);
+        parallaxShader.setMat4("projection", projection);
+        parallaxShader.setMat4("model", model);
+        parallaxShader.setFloat("shiftX", 0.0f);
+        parallaxShader.setFloat("shiftY", 0.0f);
+        parallaxShader.setFloat("shiftZ", 0.0f);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
         
         glActiveTexture(GL_TEXTURE0);
