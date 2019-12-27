@@ -16,10 +16,13 @@ uniform sampler2D depthMap;
 
 uniform float heightScale;
 
-vec2 ParallaxMapping(vec2 texCoord, vec3 viewDirection)
-{
-    const float minLayers = 8.0;
-    const float maxLayers = 32.0;
+vec2 ParallaxMapping(vec2 texCoord, vec3 viewDirection){
+    float height =  texture(depthMap, texCoord).r;
+    return texCoord - viewDirection.xy * (height * heightScale);
+}
+vec2 ReliefPMapping(vec2 texCoord, vec3 viewDirection){
+    const float minLayers = 16.0;
+    const float maxLayers = 64.0;
     // количество слоев глубины
     float nLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDirection)));
     // размер каждого слоя
@@ -28,10 +31,10 @@ vec2 ParallaxMapping(vec2 texCoord, vec3 viewDirection)
     float currentLayerDepth = 0.0;
     // величина шага смещения текстурных координат на каждом слое
     // расчитывается на основе вектора P
-    vec2 P = viewDirection.xy * heightScale;
+    vec2 P = (viewDirection.xy/viewDirection.z) * heightScale;
     vec2 deltaTexCoord = P / nLayers;
     // начальная инициализация
-    vec2  currentTexCoord     = texCoord;
+    vec2  currentTexCoord      = texCoord;
     float currentDepthMapValue = texture(depthMap, currentTexCoord).r;
     
     while(currentLayerDepth < currentDepthMapValue)
@@ -44,6 +47,33 @@ vec2 ParallaxMapping(vec2 texCoord, vec3 viewDirection)
         currentLayerDepth += layerDepth;
     }
 
+    //уполовинить смещение текстурных координат и размер слоя глубины
+    deltaTexCoord *= 0.5;
+    layerDepth *= 0.5;
+    // сместимся в обратном направлении от точки, найденной в Steep PM
+    currentTexCoord += deltaTexCoord;
+    currentLayerDepth -= layerDepth;
+    // установим максимум итераций поиска…
+    const int RELIEF_STEPS = 10;
+    int currentStep = RELIEF_STEPS;
+    while (currentStep > 0) {
+        currentDepthMapValue = texture(depthMap, currentTexCoord).r;
+        deltaTexCoord *= 0.5;
+        layerDepth *= 0.5;
+            // если выборка глубины больше текущей глубины слоя,
+            // то уходим в левую половину интервала
+            if (currentDepthMapValue > currentLayerDepth) {
+                currentTexCoord -= deltaTexCoord;
+                currentLayerDepth += layerDepth;
+            }
+            // иначе уходим в правую половину интервала
+            else {
+                currentTexCoord += deltaTexCoord;
+                currentLayerDepth -= layerDepth;
+            }
+            currentStep--;
+        }
+        
     return currentTexCoord;
     //-------------------------------------------------------------------
     /*
@@ -53,13 +83,15 @@ vec2 ParallaxMapping(vec2 texCoord, vec3 viewDirection)
     */
 }
 
+
 void main()
 {
     // offset texture coordinates with Parallax Mapping
     vec3 viewDirection = normalize(tangentViewPosition - tangentPosition);
     vec2 texCoord = TexCoord;
     
-    texCoord = ParallaxMapping(texCoord,  viewDirection);
+    //texCoord = ParallaxMapping(texCoord,  viewDirection);
+    texCoord = ReliefPMapping(texCoord,  viewDirection);
     if(texCoord.x > 1.0 || texCoord.y > 1.0 || texCoord.x < 0.0 || texCoord.y < 0.0)
         discard;
 

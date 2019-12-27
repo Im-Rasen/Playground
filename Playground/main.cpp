@@ -131,7 +131,7 @@ int main()
     //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     //Режим смешивания
     glEnable(GL_BLEND);
-    //GL_CLAMP_TO_EDGE - решим повторения текстуры, если прозрачная
+    //GL_CLAMP_TO_EDGE
     //Прозрачность источника - для источника, 1-прозрачность источника - для приемника
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     //glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
@@ -635,11 +635,11 @@ int main()
     */
     GLuint normalBrick = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/brickwall_normal.png");
     
-    GLuint diffuseMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/pavement.png");
+    GLuint diffuseMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/bricks2.png");
     
-    GLuint normalMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/pavement_normal.png");
+    GLuint normalMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/bricks2_normal.png");
     
-    GLuint depthMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/pavement_depth2.png");
+    GLuint depthMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/bricks2_disp.png");
 
     //Кубическая карта
     std::vector<std::string> faces

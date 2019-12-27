@@ -36,7 +36,7 @@ void main()
 {
        //Normal = normal;
     worldPosition = vec3(model * vec4(position, 1.0f));
-    TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);
+    TexCoord = vec2(texCoord.x, texCoord.y);
     
     //Normal = mat3(transpose(inverse(model))) * normal;
     
