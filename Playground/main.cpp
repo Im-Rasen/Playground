@@ -636,10 +636,13 @@ int main()
     GLuint normalBrick = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/brickwall_normal.png");
     
     GLuint diffuseMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/bricks2.png");
+    //GLuint diffuseMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/pavement.png");
     
     GLuint normalMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/bricks2_normal.png");
+    //GLuint normalMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/pavement_normal.png");
     
     GLuint depthMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/bricks2_disp.png");
+    //GLuint depthMap = loadTexture("/Users/JulieClark/Documents/ВМК/graphics/Playground/Playground/pavement_depth.png");
 
     //Кубическая карта
     std::vector<std::string> faces
